@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Biggie Hub G@mes</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<style>
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: system-ui, sans-serif;
+  }
+
+  html, body {
+    height: 100%;
+  }
+
+  body {
+    background: #050509;
+    color: #fff;
+    overflow: hidden;
+  }
+
+  /* Full black intro overlay */
+  #intro-overlay {
+    position: fixed;
+    inset: 0;
+    background: #000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: fadeOut 0.5s ease-out 1.5s forwards;
+  }
+
+  #intro-title {
+    font-size: 2.4rem;
+    letter-spacing: 0.08em;
+    text-align: center;
+  }
+
+  #intro-subtitle {
+    margin-top: 0.6rem;
+    font-size: 1.1rem;
+    opacity: 0.8;
+  }
+
+  @keyframes fadeOut {
+    to {
+      opacity: 0;
+      visibility: hidden;
+    }
+  }
+
+  #hub-root {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 480px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .hub-panel {
+    width: min(960px, 95vw);
+    height: min(600px, 90vh);
+    border-radius: 18px;
+    background: rgba(0, 0, 0, 0.65);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow:
+      0 20px 45px rgba(0, 0, 0, 0.85),
+      0 0 0 1px rgba(255, 255, 255, 0.02);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    color: #f5f5f5;
+    display: flex;
+    flex-direction: column;
+    padding: 16px 18px;
+  }
+
+  .hub-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+
+  .hub-title {
+    font-size: 1.4rem;
+    font-weight: 600;
+  }
+
+  .hub-badge {
+    font-size: 0.8rem;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+  }
+
+  .hub-body {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 210px 1fr;
+    gap: 14px;
+    min-height: 0;
+  }
+
+  .hub-column-title {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    opacity: 0.7;
+    margin-bottom: 8px;
+  }
+
+  /* Left: game list */
+  .game-list {
+    border-radius: 14px;
+    padding: 10px;
+    background: radial-gradient(circle at top left, rgba(255,255,255,0.12), transparent 55%),
+                rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    height: 100%;
+    overflow-y: auto;
+  }
+
+  .game-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 8px;
+    border-radius: 10px;
+    margin-bottom: 6px;
+    cursor: pointer;
+    transition: background 0.18s ease, transform 0.08s ease;
+  }
+
+  .game-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateY(-1px);
+  }
+
+  .game-item.active {
+    background: linear-gradient(135deg, rgba(64,255,159,0.25), rgba(50,181,255,0.35));
+    border: 1px solid rgba(255,255,255,0.25);
+  }
+
+  .game-name {
+    font-size: 0.92rem;
+  }
+
+  .game-type {
+    font-size: 0.7rem;
+    opacity: 0.7;
+  }
+
+  .pill {
+    font-size: 0.7rem;
+    padding: 2px 8px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    background: rgba(0,0,0,0.4);
+    margin-left: 6px;
+  }
+
+  /* Right: game screen */
+  .game-screen {
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: radial-gradient(circle at top, rgba(255,255,255,0.16), transparent 55%),
+                rgba(0, 0, 0, 0.7);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .screen-header {
+    padding: 6px 10px;
+    font-size: 0.85rem;
+    opacity: 0.9;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .screen-status {
+    font-size: 0.75rem;
+    opacity: 0.8;
+  }
+
+  .screen-body {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    min-height: 0;
+  }
+
+  .screen-body-inner {
+    width: 100%;
+    height: 100%;
+    border-radius: 0 0 14px 14px;
+    background: #020308;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  canvas {
+    background: #020204;
+    border-radius: 10px;
+    width: 100%;
+    height: 100%;
+  }
+
+  .hub-footer {
+    margin-top: 6px;
+    font-size: 0.75rem;
+    opacity: 0.65;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  @media (max-width: 720px) {
+    .hub-body {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+</head>
+<body>
+<div id="intro-overlay">
+  <div id="intro-title">Biggie Hub Games</div>
+  <div id="intro-subtitle">Made by Rocco</div>
+</div>
+
+<div id="hub-root">
+  <div class="hub-panel">
+    <div class="hub-header">
+      <div class="hub-title">Biggie Hub G@mes</div>
+      <div class="hub-badge">v1.0</div>
+    </div>
+
+    <div class="hub-body">
+      <!-- Left column: games -->
+      <div>
+        <div class="hub-column-title">Games</div>
+        <div class="game-list">
+          <div class="game-item active" data-game="shooter">
+            <div>
+              <div class="game-name">2D Shooter</div>
+              <div class="game-type">Arrow keys + Space</div>
+            </div>
+            <span class="pill">Easy</span>
+          </div>
+
+          <div class="game-item" data-game="dodger">
+            <div>
+              <div class="game-name">Square Dodger</div>
+              <div class="game-type">Arrow keys</div>
+            </div>
+            <span class="pill">Reflex</span>
+          </div>
+
+          <div class="game-item" data-game="clicker">
+            <div>
+              <div class="game-name">Rocco Clicker</div>
+              <div class="game-type">Mouse / touch</div>
+            </div>
+            <span class="pill">Chill</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right column: game area -->
+      <div class="game-screen">
+        <div class="screen-header">
+          <span id="screen-title">2D Shooter</span>
+          <span class="screen-status">
+            Status: <span id="screen-status-text">Ready</span>
+          </span>
+        </div>
+        <div class="screen-body">
+          <div class="screen-body-inner">
+            <canvas id="game-canvas" width="480" height="320"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hub-footer">
+      <span>Made by Rocco</span>
+      <span>Use arrow keys and space / click to play.</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Intro overlay timing (for Google Sites it's fine)
+  window.addEventListener("load", () => {
+    setTimeout(() => {
+      const intro = document.getElementById("intro-overlay");
+      if (intro) {
+        intro.style.pointerEvents = "none";
+        intro.style.display = "none";
+      }
+    }, 1500);
+  });
+
+  const gameItems = document.querySelectorAll(".game-item");
+  const screenTitle = document.getElementById("screen-title");
+  const statusText = document.getElementById("screen-status-text");
+  const canvas = document.getElementById("game-canvas");
+  const ctx = canvas.getContext("2d");
+
+  let currentGame = null;
+  let gameLoopId = null;
+  let keys = {};
+
+  window.addEventListener("keydown", e => {
+    keys[e.key] = true;
+    // prevent scrolling on arrows / space
+    if (["ArrowLeft","ArrowRight","ArrowUp","ArrowDown"," "].includes(e.key)) {
+      e.preventDefault();
+    }
+  });
+  window.addEventListener("keyup", e => {
+    keys[e.key] = false;
+  });
+
+  function stopGame() {
+    if (gameLoopId !== null) {
+      cancelAnimationFrame(gameLoopId);
+      gameLoopId = null;
+    }
+  }
+
+  function clearCanvas() {
+    ctx.fillStyle = "#020204";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }
+
+  // Simple 2D Shooter game
+  function startShooter() {
+    const player = { x: canvas.width / 2 - 15, y: canvas.height - 40, w: 30, h: 20, speed: 4 };
+    const bullets = [];
+    const enemies = [];
+    let lastEnemy = 0;
+    let score = 0;
+
+    function spawnEnemy(timestamp) {
+      if (timestamp - lastEnemy > 800) {
+        const w = 30;
+        const x = Math.random() * (canvas.width - w);
+        enemies.push({ x, y: -20, w, h: 20, speed: 1.5 + Math.random() * 1.5 });
+        lastEnemy = timestamp;
+      }
+    }
+
+    function loop(timestamp) {
+      gameLoopId = requestAnimationFrame(loop);
+      clearCanvas();
+
+      // input
+      if (keys["ArrowLeft"]) player.x -= player.speed;
+      if (keys["ArrowRight"]) player.x += player.speed;
+      if (player.x < 0) player.x = 0;
+      if (player.x + player.w > canvas.width) player.x = canvas.width - player.w;
+
+      // shooting
+      if (keys[" "] && bullets.length === 0 || (keys[" "] && bullets[bullets.length-1].y < canvas.height - 120)) {
+        bullets.push({ x: player.x + player.w / 2 - 2, y: player.y, w: 4, h: 10, speed: 5 });
+      }
+
+      spawnEnemy(timestamp);
+
+      // update bullets
+      for (let i = bullets.length - 1; i >= 0; i--) {
+        const b = bullets[i];
+        b.y -= b.speed;
+        if (b.y + b.h < 0) bullets.splice(i, 1);
+      }
+
+      // update enemies
+      for (let i = enemies.length - 1; i >= 0; i--) {
+        const en = enemies[i];
+        en.y += en.speed;
+        if (en.y > canvas.height + 40) enemies.splice(i, 1);
+      }
+
+      // collisions
+      for (let i = enemies.length - 1; i >= 0; i--) {
+        const en = enemies[i];
+        // player hit
+        if (rectOverlap(player, en)) {
+          statusText.textContent = "Game Over! Score " + score;
+          stopGame();
+          return;
+        }
+        for (let j = bullets.length - 1; j >= 0; j--) {
+          const b = bullets[j];
+          if (rectOverlap(b, en)) {
+            enemies.splice(i, 1);
+            bullets.splice(j, 1);
+            score++;
+            break;
+          }
+        }
+      }
+
+      // draw player
+      ctx.fillStyle = "#40ff9f";
+      ctx.fillRect(player.x, player.y, player.w, player.h);
+
+      // player turret
+      ctx.fillRect(player.x + player.w / 2 - 3, player.y - 8, 6, 8);
+
+      // bullets
+      ctx.fillStyle = "#ffffff";
+      bullets.forEach(b => ctx.fillRect(b.x, b.y, b.w, b.h));
+
+      // enemies
+      ctx.fillStyle = "#ff4f6a";
+      enemies.forEach(en => ctx.fillRect(en.x, en.y, en.w, en.h));
+
+      // score
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "14px monospace";
+      ctx.fillText("Score: " + score, 10, 18);
+    }
+
+    loop(0);
+  }
+
+  // Dodger game
+  function startDodger() {
+    const player = { x: canvas.width / 2 - 15, y: canvas.height - 40, w: 30, h: 30, speed: 4 };
+    const obstacles = [];
+    let lastObs = 0;
+    let timeAlive = 0;
+
+    function spawnObs(timestamp) {
+      if (timestamp - lastObs > 650) {
+        const size = 20 + Math.random() * 20;
+        const x = Math.random() * (canvas.width - size);
+        obstacles.push({ x, y: -size, w: size, h: size, speed: 2 + Math.random() * 2 });
+        lastObs = timestamp;
+      }
+    }
+
+    function loop(timestamp) {
+      gameLoopId = requestAnimationFrame(loop);
+      clearCanvas();
+
+      timeAlive = (timestamp / 1000).toFixed(1);
+
+      if (keys["ArrowLeft"]) player.x -= player.speed;
+      if (keys["ArrowRight"]) player.x += player.speed;
+      if (keys["ArrowUp"]) player.y -= player.speed;
+      if (keys["ArrowDown"]) player.y += player.speed;
+
+      if (player.x < 0) player.x = 0;
+      if (player.x + player.w > canvas.width) player.x = canvas.width - player.w;
+      if (player.y < 0) player.y = 0;
+      if (player.y + player.h > canvas.height) player.y = canvas.height - player.h;
+
+      spawnObs(timestamp);
+
+      for (let i = obstacles.length - 1; i >= 0; i--) {
+        const o = obstacles[i];
+        o.y += o.speed;
+        if (o.y > canvas.height + 40) obstacles.splice(i, 1);
+      }
+
+      for (const o of obstacles) {
+        if (rectOverlap(player, o)) {
+          statusText.textContent = "You survived " + timeAlive + "s";
+          stopGame();
+          return;
+        }
+      }
+
+      ctx.fillStyle = "#4bc0ff";
+      ctx.fillRect(player.x, player.y, player.w, player.h);
+
+      ctx.fillStyle = "#ffb647";
+      obstacles.forEach(o => ctx.fillRect(o.x, o.y, o.w, o.h));
+
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "14px monospace";
+      ctx.fillText("Time: " + timeAlive + "s", 10, 18);
+    }
+
+    loop(0);
+  }
+
+  // Clicker game
+  function startClicker() {
+    clearCanvas();
+    let score = 0;
+    let target = randomTarget();
+
+    canvas.onclick = function (e) {
+      const rect = canvas.getBoundingClientRect();
+      const x = (e.clientX - rect.left) * (canvas.width / rect.width);
+      const y = (e.clientY - rect.top) * (canvas.height / rect.height);
+      const dx = x - target.x;
+      const dy = y - target.y;
+      if (Math.sqrt(dx*dx + dy*dy) <= target.r) {
+        score++;
+        target = randomTarget();
+      }
+    };
+
+    function loop() {
+      gameLoopId = requestAnimationFrame(loop);
+      clearCanvas();
+
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "16px monospace";
+      ctx.fillText("Score: " + score, 10, 22);
+
+      ctx.fillStyle = "#40ff9f";
+      ctx.beginPath();
+      ctx.arc(target.x, target.y, target.r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    loop();
+  }
+
+  function randomTarget() {
+    return {
+      x: 40 + Math.random() * (canvas.width - 80),
+      y: 50 + Math.random() * (canvas.height - 80),
+      r: 18
+    };
+  }
+
+  function rectOverlap(a, b) {
+    return !(
+      a.x + a.w < b.x ||
+      a.x > b.x + b.w ||
+      a.y + a.h < b.y ||
+      a.y > b.y + b.h
+    );
+  }
+
+  // Game switching
+  function loadGame(name) {
+    stopGame();
+    clearCanvas();
+    canvas.onclick = null;
+    statusText.textContent = "Ready";
+
+    if (name === "shooter") {
+      screenTitle.textContent = "2D Shooter";
+      startShooter();
+    } else if (name === "dodger") {
+      screenTitle.textContent = "Square Dodger";
+      startDodger();
+    } else if (name === "clicker") {
+      screenTitle.textContent = "Rocco Clicker";
+      startClicker();
+    }
+  }
+
+  gameItems.forEach(item => {
+    item.addEventListener("click", () => {
+      gameItems.forEach(i => i.classList.remove("active"));
+      item.classList.add("active");
+      const game = item.getAttribute("data-game");
+      loadGame(game);
+    });
+  });
+
+  // Start with shooter by default
+  loadGame("shooter");
+</script>
+</body>
+</html>
