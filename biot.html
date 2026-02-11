@@ -1,0 +1,482 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Rocco BitLife Remake</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+      color: white;
+      min-height: 100vh;
+      padding: 15px;
+    }
+    
+    #game { 
+      max-width: 420px; 
+      margin: 0 auto;
+      background: rgba(255,255,255,0.08);
+      backdrop-filter: blur(20px);
+      border-radius: 25px;
+      border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+      overflow: hidden;
+    }
+    
+    .header {
+      background: linear-gradient(135deg, #ff6b6b, #feca57);
+      padding: 25px;
+      text-align: center;
+    }
+    
+    h1 { 
+      font-size: 24px; 
+      font-weight: 700;
+      margin-bottom: 5px;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    }
+    
+    .subtitle { font-size: 14px; opacity: 0.9; }
+    
+    .section { 
+      padding: 25px; 
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .section:last-child { border-bottom: none; }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    
+    .stat {
+      background: rgba(255,255,255,0.1);
+      padding: 15px 10px;
+      border-radius: 15px;
+      text-align: center;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.2);
+      transition: all 0.3s ease;
+    }
+    
+    .stat:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+    
+    .stat-value { 
+      font-size: 22px; 
+      font-weight: 700; 
+      display: block;
+      margin-bottom: 3px;
+    }
+    
+    .stat-label { font-size: 12px; opacity: 0.8; }
+    
+    .health .stat-value { color: #ff4757; }
+    .happiness .stat-value { color: #2ed573; }
+    .looks .stat-value { color: #ffa502; }
+    .smart .stat-value { color: #3742fa; }
+    .wealth .stat-value { color: #ff6348; }
+    
+    .character-card {
+      background: rgba(255,255,255,0.15);
+      border-radius: 18px;
+      padding: 20px;
+      text-align: center;
+      margin-bottom: 20px;
+      backdrop-filter: blur(15px);
+    }
+    
+    .char-name { font-size: 24px; font-weight: 700; margin-bottom: 5px; }
+    .char-age { font-size: 16px; opacity: 0.9; }
+    .country-flag { font-size: 28px; display: block; margin-bottom: 8px; }
+    
+    button {
+      width: 100%;
+      padding: 15px;
+      margin: 6px 0;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      backdrop-filter: blur(10px);
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      box-shadow: 0 8px 20px rgba(102,126,234,0.4);
+    }
+    
+    .btn-primary:hover { 
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(102,126,234,0.6);
+    }
+    
+    .btn-secondary {
+      background: rgba(255,255,255,0.15);
+      color: white;
+      border: 1px solid rgba(255,255,255,0.3);
+    }
+    
+    .btn-secondary:hover { background: rgba(255,255,255,0.25); }
+    
+    button:disabled {
+      opacity: 0.5; cursor: not-allowed; transform: none !important;
+    }
+    
+    .log {
+      height: 220px;
+      overflow-y: auto;
+      background: rgba(0,0,0,0.3);
+      border-radius: 15px;
+      padding: 15px;
+      font-size: 13px;
+      line-height: 1.4;
+      backdrop-filter: blur(10px);
+    }
+    
+    .log-entry {
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      opacity: 0.9;
+    }
+    
+    .log-entry:last-child { border-bottom: none; }
+    
+    .log-name { font-weight: 600; color: #feca57; }
+    
+    .input-group {
+      margin-bottom: 15px;
+    }
+    
+    label { 
+      display: block; 
+      margin-bottom: 8px; 
+      font-weight: 500; 
+      font-size: 14px;
+    }
+    
+    input, select {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 12px;
+      background: rgba(255,255,255,0.1);
+      color: white;
+      font-size: 16px;
+      backdrop-filter: blur(10px);
+    }
+    
+    input::placeholder { color: rgba(255,255,255,0.7); }
+    
+    input:focus, select:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102,126,234,0.3);
+    }
+    
+    .hidden { display: none !important; }
+    
+    .game-over {
+      text-align: center;
+      background: linear-gradient(135deg, #ff4757, #ff3838);
+      padding: 30px;
+    }
+    
+    .game-over h2 { margin-bottom: 15px; font-size: 22px; }
+  </style>
+</head>
+<body>
+  <div id="game">
+    <!-- Header -->
+    <div class="header">
+      <h1>🎮 Rocco BitLife</h1>
+      <div class="subtitle">Live your life, make choices</div>
+    </div>
+
+    <!-- Character Creation -->
+    <div id="characterCreation" class="section">
+      <div class="character-card">
+        <div class="country-flag" id="previewFlag">🌍</div>
+        <div class="char-name" id="previewName">Your Name</div>
+        <span class="char-age" id="previewAge">Age 0</span>
+      </div>
+      
+      <div class="input-group">
+        <label>Name</label>
+        <input type="text" id="charName" placeholder="Enter your name" value="Rocco">
+      </div>
+      
+      <div class="input-group">
+        <label>Gender</label>
+        <select id="charGender">
+          <option value="male">👨 Male</option>
+          <option value="female">👩 Female</option>
+        </select>
+      </div>
+      
+      <div class="input-group">
+        <label>Country</label>
+        <select id="charCountry">
+          <option value="usa">🇺🇸 United States</option>
+          <option value="uk">🇬🇧 United Kingdom</option>
+          <option value="canada">🇨🇦 Canada</option>
+          <option value="australia">🇦🇺 Australia</option>
+          <option value="germany">🇩🇪 Germany</option>
+          <option value="france">🇫🇷 France</option>
+          <option value="japan">🇯🇵 Japan</option>
+          <option value="brazil">🇧🇷 Brazil</option>
+          <option value="nigeria">🇳🇬 Nigeria</option>
+          <option value="india">🇮🇳 India</option>
+        </select>
+      </div>
+      
+      <button id="startLifeBtn" class="btn-primary">🚀 Start My Life</button>
+    </div>
+
+    <!-- Main Game -->
+    <div id="mainGame" class="hidden">
+      <div class="section">
+        <div class="character-card" id="characterInfo">
+          <div class="country-flag" id="countryFlag"></div>
+          <div class="char-name" id="currentName"></div>
+          <div class="char-age">
+            Age: <span id="currentAge">0</span> | 
+            Year: <span id="currentYear">2026</span>
+          </div>
+        </div>
+        
+        <div class="stats-grid" id="stats"></div>
+      </div>
+      
+      <div class="section">
+        <button id="ageBtn" class="btn-primary">⏭️ Age One Year</button>
+        <button id="randomEventBtn" class="btn-secondary">🎲 Random Event</button>
+        <button id="restartBtn" class="btn-secondary">🔄 New Life</button>
+      </div>
+      
+      <div class="section">
+        <h3 style="margin-bottom: 15px; font-size: 16px;">📜 Life Achievements</h3>
+        <div class="log" id="log"></div>
+      </div>
+    </div>
+    
+    <!-- Game Over -->
+    <div id="gameOver" class="section game-over hidden">
+      <h2>💀 Game Over</h2>
+      <div style="margin-bottom: 20px; font-size: 16px;">
+        Lived to age <span id="finalAge"></span>
+      </div>
+      <button id="restartFromOver" class="btn-primary">🎮 Play Again</button>
+    </div>
+  </div>
+
+  <script>
+    // Game state with ROUND INTEGERS ONLY
+    const state = {
+      name: '', gender: '', country: '',
+      age: 0, year: 2026, alive: true,
+      health: 85, happiness: 65, looks: 50,
+      smartness: 50, wealth: 10, log: []
+    };
+
+    // UI Elements
+    const els = {
+      charName: document.getElementById('charName'),
+      charGender: document.getElementById('charGender'),
+      charCountry: document.getElementById('charCountry'),
+      startLifeBtn: document.getElementById('startLifeBtn'),
+      characterCreation: document.getElementById('characterCreation'),
+      mainGame: document.getElementById('mainGame'),
+      gameOver: document.getElementById('gameOver'),
+      stats: document.getElementById('stats'),
+      log: document.getElementById('log'),
+      currentName: document.getElementById('currentName'),
+      currentAge: document.getElementById('currentAge'),
+      currentYear: document.getElementById('currentYear'),
+      countryFlag: document.getElementById('countryFlag'),
+      previewFlag: document.getElementById('previewFlag'),
+      previewName: document.getElementById('previewName'),
+      previewAge: document.getElementById('previewAge')
+    };
+
+    // ROUND ALL VALUES
+    function roundStats() {
+      state.health = Math.round(state.health);
+      state.happiness = Math.round(state.happiness);
+      state.looks = Math.round(state.looks);
+      state.smartness = Math.round(state.smartness);
+      state.wealth = Math.round(state.wealth);
+    }
+
+    function clamp(val, min, max) {
+      return Math.max(min, Math.min(max, val));
+    }
+
+    function updateStatsUI() {
+      roundStats(); // ENSURE CLEAN INTEGERS
+      
+      els.stats.innerHTML = `
+        <div class="stat health">
+          <span class="stat-value">${state.health}</span>
+          <span class="stat-label">Health</span>
+        </div>
+        <div class="stat happiness">
+          <span class="stat-value">${state.happiness}</span>
+          <span class="stat-label">Happiness</span>
+        </div>
+        <div class="stat looks">
+          <span class="stat-value">${state.looks}</span>
+          <span class="stat-label">Looks</span>
+        </div>
+        <div class="stat smart">
+          <span class="stat-value">${state.smartness}</span>
+          <span class="stat-label">Smartness</span>
+        </div>
+        <div class="stat wealth">
+          <span class="stat-value">$${state.wealth}</span>
+          <span class="stat-label">Wealth</span>
+        </div>
+      `;
+      
+      els.currentAge.textContent = state.age;
+      els.currentYear.textContent = state.year;
+    }
+
+    function getFlag(country) {
+      const flags = {usa:'🇺🇸',uk:'🇬🇧',canada:'🇨🇦',australia:'🇦🇺',germany:'🇩🇪',
+                     france:'🇫🇷',japan:'🇯🇵',brazil:'🇧🇷',nigeria:'🇳🇬',india:'🇮🇳'};
+      return flags[country] || '🌍';
+    }
+
+    function addLog(message) {
+      const div = document.createElement('div');
+      div.className = 'log-entry';
+      div.innerHTML = `<span class="log-name">${state.name}</span> (${state.age}) ${message}`;
+      els.log.insertBefore(div, els.log.firstChild);
+      
+      if (els.log.children.length > 20) {
+        els.log.removeChild(els.log.lastChild);
+      }
+      els.log.scrollTop = 0;
+    }
+
+    function previewUpdate() {
+      els.previewName.textContent = els.charName.value || 'Your Name';
+      els.previewFlag.textContent = getFlag(els.charCountry.value);
+    }
+
+    function startGame() {
+      state.name = els.charName.value || 'Rocco';
+      state.gender = els.charGender.value;
+      state.country = els.charCountry.value;
+      
+      // CLEAN ROUND STARTING STATS
+      state.health = 85 + Math.floor(Math.random() * 15);
+      state.happiness = 65 + Math.floor(Math.random() * 20);
+      state.looks = 40 + Math.floor(Math.random() * 40);
+      state.smartness = 45 + Math.floor(Math.random() * 30);
+      state.wealth = 5 + Math.floor(Math.random() * 10);
+      
+      roundStats();
+      
+      els.characterCreation.classList.add('hidden');
+      els.mainGame.classList.remove('hidden');
+      
+      els.countryFlag.textContent = getFlag(state.country);
+      els.currentName.textContent = state.name;
+      
+      updateStatsUI();
+      addLog('👶 Born into the world!');
+    }
+
+    function ageOneYear() {
+      state.age++;
+      state.year++;
+      
+      // Age effects
+      if (state.age > 60) state.health -= 2;
+      if (state.age > 80) state.health -= 4;
+      
+      // Random life changes
+      state.happiness += Math.floor(Math.random() * 3) - 1;
+      state.health += Math.floor(Math.random() * 2) - 1;
+      
+      roundStats();
+      
+      // Death check
+      if (state.health <= 0) {
+        gameOver('Health failed');
+        return;
+      }
+      if (state.age >= 110) {
+        gameOver('Incredible long life!');
+        return;
+      }
+      
+      // Age milestone
+      const milestones = {
+        5: 'Started school!',
+        18: 'Became an adult!',
+        30: 'Career established!',
+        65: 'Retirement age!'
+      };
+      
+      if (milestones[state.age]) {
+        addLog(milestones[state.age]);
+        state.happiness += 5;
+      }
+      
+      updateStatsUI();
+    }
+
+    function gameOver(reason) {
+      state.alive = false;
+      document.getElementById('finalAge').textContent = state.age;
+      els.mainGame.classList.add('hidden');
+      els.gameOver.classList.remove('hidden');
+      
+      addLog(`💀 Died at age ${state.age}: ${reason}`);
+      document.getElementById('ageBtn').disabled = true;
+    }
+
+    // Event listeners
+    els.startLifeBtn.onclick = startGame;
+    document.getElementById('ageBtn').onclick = ageOneYear;
+    document.getElementById('randomEventBtn').onclick = () => {
+      const events = [
+        {text: 'Lottery win! +$10k', wealth: 10000},
+        {text: 'Got sick -10 health', health: -10},
+        {text: 'New friend! +15 happiness', happiness: 15},
+        {text: 'Promotion! +$5k', wealth: 5000},
+        {text: 'Family vacation +10 happiness', happiness: 10}
+      ];
+      
+      const event = events[Math.floor(Math.random() * events.length)];
+      addLog(event.text);
+      
+      if (event.wealth) state.wealth += event.wealth;
+      if (event.health) state.health = Math.max(0, state.health + event.health);
+      if (event.happiness) state.happiness = Math.min(100, state.happiness + event.happiness);
+      
+      roundStats();
+      updateStatsUI();
+    };
+    
+    document.getElementById('restartBtn').onclick = () => location.reload();
+    document.getElementById('restartFromOver').onclick = () => location.reload();
+    
+    // Live preview
+    els.charName.oninput = previewUpdate;
+    els.charCountry.onchange = previewUpdate;
+    previewUpdate();
+  </script>
+</body>
+</html>
