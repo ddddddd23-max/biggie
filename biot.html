@@ -5,215 +5,454 @@
   <title>Rocco BitLife Remake</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
+    :root {
+      --bg-start: #0f0f23;
+      --bg-middle: #1a1a2e;
+      --bg-end: #16213e;
+      --glass: rgba(255,255,255,0.08);
+      --glass-strong: rgba(255,255,255,0.16);
+      --border-subtle: rgba(255,255,255,0.12);
+      --accent: #667eea;
+      --accent-soft: rgba(102,126,234,0.4);
+      --danger: #ff4757;
+      --success: #2ed573;
+      --text-muted: rgba(255,255,255,0.75);
+      --chip-bg: rgba(255,255,255,0.12);
+    }
+
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    
-    body { 
+
+    body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+      background: radial-gradient(circle at 0% 0%, #2f3542 0, transparent 55%),
+                  radial-gradient(circle at 100% 100%, #3742fa 0, transparent 55%),
+                  linear-gradient(135deg, var(--bg-start) 0%, var(--bg-middle) 50%, var(--bg-end) 100%);
       color: white;
       min-height: 100vh;
-      padding: 15px;
+      padding: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-    
-    #game { 
-      max-width: 420px; 
-      margin: 0 auto;
-      background: rgba(255,255,255,0.08);
-      backdrop-filter: blur(20px);
-      border-radius: 25px;
-      border: 1px solid rgba(255,255,255,0.1);
-      box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+
+    #game {
+      width: 100%;
+      max-width: 460px;
+      background: var(--glass);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-radius: 26px;
+      border: 1px solid rgba(255,255,255,0.15);
+      box-shadow: 0 28px 60px rgba(0,0,0,0.6);
       overflow: hidden;
+      position: relative;
     }
-    
+
+    /* decorative orbs */
+    #game::before,
+    #game::after {
+      content: "";
+      position: absolute;
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      filter: blur(30px);
+      opacity: 0.28;
+      z-index: -1;
+    }
+    #game::before {
+      background: #ff6b81;
+      top: -40px;
+      right: -60px;
+    }
+    #game::after {
+      background: #1e90ff;
+      bottom: -40px;
+      left: -60px;
+    }
+
     .header {
       background: linear-gradient(135deg, #ff6b6b, #feca57);
-      padding: 25px;
-      text-align: center;
-    }
-    
-    h1 { 
-      font-size: 24px; 
-      font-weight: 700;
-      margin-bottom: 5px;
-      text-shadow: 0 2px 10px rgba(0,0,0,0.3);
-    }
-    
-    .subtitle { font-size: 14px; opacity: 0.9; }
-    
-    .section { 
-      padding: 25px; 
-      border-bottom: 1px solid rgba(255,255,255,0.1);
-    }
-    
-    .section:last-child { border-bottom: none; }
-    
-    .stats-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
+      padding: 20px 22px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       gap: 12px;
-      margin-bottom: 20px;
     }
-    
-    .stat {
-      background: rgba(255,255,255,0.1);
-      padding: 15px 10px;
-      border-radius: 15px;
-      text-align: center;
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255,255,255,0.2);
-      transition: all 0.3s ease;
+
+    .header-main {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
     }
-    
-    .stat:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
-    
-    .stat-value { 
-      font-size: 22px; 
-      font-weight: 700; 
-      display: block;
+
+    h1 {
+      font-size: 22px;
+      font-weight: 800;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.25);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .subtitle {
+      font-size: 13px;
+      opacity: 0.95;
+    }
+
+    .header-stats {
+      display: flex;
+      gap: 10px;
+      font-size: 12px;
+    }
+
+    .header-pill {
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.2);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .section {
+      padding: 20px 22px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .section-title {
+      font-size: 15px;
+      margin-bottom: 10px;
+      opacity: 0.9;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .section:last-child { border-bottom: none; }
+
+    .character-card {
+      background: var(--glass-strong);
+      border-radius: 18px;
+      padding: 16px 16px 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .char-avatar {
+      width: 52px;
+      height: 52px;
+      border-radius: 18px;
+      background: radial-gradient(circle at 30% 20%, #fff 0, transparent 45%),
+                  radial-gradient(circle at 80% 100%, #000 0, transparent 55%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30px;
+    }
+
+    .char-meta {
+      flex: 1;
+    }
+
+    .char-name {
+      font-size: 18px;
+      font-weight: 700;
       margin-bottom: 3px;
     }
-    
-    .stat-label { font-size: 12px; opacity: 0.8; }
-    
-    .health .stat-value { color: #ff4757; }
+
+    .char-age {
+      font-size: 13px;
+      color: var(--text-muted);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .char-tag {
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(0,0,0,0.22);
+      font-size: 11px;
+    }
+
+    .country-flag {
+      font-size: 26px;
+    }
+
+    .trait-pill {
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.14);
+      font-size: 11px;
+      margin-top: 4px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .stat {
+      background: rgba(0,0,0,0.28);
+      padding: 10px 8px;
+      border-radius: 14px;
+      text-align: center;
+      border: 1px solid rgba(255,255,255,0.18);
+      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    }
+
+    .stat:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 24px rgba(0,0,0,0.35);
+      border-color: rgba(255,255,255,0.35);
+    }
+
+    .stat-value {
+      font-size: 18px;
+      font-weight: 700;
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      opacity: 0.8;
+    }
+
+    .health .stat-value { color: #ff6b81; }
     .happiness .stat-value { color: #2ed573; }
     .looks .stat-value { color: #ffa502; }
-    .smart .stat-value { color: #3742fa; }
-    .wealth .stat-value { color: #ff6348; }
-    
-    .character-card {
-      background: rgba(255,255,255,0.15);
-      border-radius: 18px;
-      padding: 20px;
-      text-align: center;
-      margin-bottom: 20px;
-      backdrop-filter: blur(15px);
-    }
-    
-    .char-name { font-size: 24px; font-weight: 700; margin-bottom: 5px; }
-    .char-age { font-size: 16px; opacity: 0.9; }
-    .country-flag { font-size: 28px; display: block; margin-bottom: 8px; }
-    
+    .smart .stat-value { color: #70a1ff; }
+    .wealth .stat-value { color: #ff9f43; }
+    .relationship .stat-value { color: #ff6bcb; }
+
     button {
       width: 100%;
-      padding: 15px;
-      margin: 6px 0;
+      padding: 13px;
+      margin: 5px 0;
       border: none;
       border-radius: 12px;
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.2s;
+      transition: all 0.16s;
       backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
     }
-    
+
     .btn-primary {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, var(--accent) 0%, #764ba2 100%);
       color: white;
-      box-shadow: 0 8px 20px rgba(102,126,234,0.4);
+      box-shadow: 0 10px 22px var(--accent-soft);
     }
-    
-    .btn-primary:hover { 
+
+    .btn-primary:hover {
       transform: translateY(-2px);
-      box-shadow: 0 12px 30px rgba(102,126,234,0.6);
+      box-shadow: 0 14px 32px rgba(102,126,234,0.65);
     }
-    
+
     .btn-secondary {
-      background: rgba(255,255,255,0.15);
+      background: rgba(255,255,255,0.12);
       color: white;
-      border: 1px solid rgba(255,255,255,0.3);
+      border: 1px solid rgba(255,255,255,0.22);
     }
-    
-    .btn-secondary:hover { background: rgba(255,255,255,0.25); }
-    
+
+    .btn-secondary:hover {
+      background: rgba(255,255,255,0.18);
+      transform: translateY(-1px);
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, #ff4757, #e84118);
+      color: white;
+    }
+
+    .btn-danger:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 26px rgba(255,71,87,0.6);
+    }
+
     button:disabled {
-      opacity: 0.5; cursor: not-allowed; transform: none !important;
+      opacity: 0.52;
+      cursor: not-allowed;
+      transform: none !important;
+      box-shadow: none !important;
     }
-    
+
     .log {
       height: 220px;
       overflow-y: auto;
-      background: rgba(0,0,0,0.3);
+      background: rgba(0,0,0,0.32);
       border-radius: 15px;
-      padding: 15px;
+      padding: 12px;
       font-size: 13px;
       line-height: 1.4;
       backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
     }
-    
+
     .log-entry {
-      padding: 8px 0;
-      border-bottom: 1px solid rgba(255,255,255,0.1);
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
       opacity: 0.9;
     }
-    
+
     .log-entry:last-child { border-bottom: none; }
-    
-    .log-name { font-weight: 600; color: #feca57; }
-    
-    .input-group {
-      margin-bottom: 15px;
+
+    .log-name {
+      font-weight: 600;
+      color: #feca57;
     }
-    
-    label { 
-      display: block; 
-      margin-bottom: 8px; 
-      font-weight: 500; 
-      font-size: 14px;
+
+    .log-tag {
+      font-size: 11px;
+      opacity: 0.85;
+      margin-left: 4px;
     }
-    
+
+    .input-group { margin-bottom: 15px; }
+
+    label {
+      display: block;
+      margin-bottom: 7px;
+      font-weight: 500;
+      font-size: 13px;
+    }
+
     input, select {
       width: 100%;
-      padding: 14px;
-      border: 1px solid rgba(255,255,255,0.3);
+      padding: 12px;
+      border: 1px solid rgba(255,255,255,0.24);
       border-radius: 12px;
-      background: rgba(255,255,255,0.1);
+      background: rgba(0,0,0,0.35);
       color: white;
-      font-size: 16px;
+      font-size: 15px;
       backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
     }
-    
+
     input::placeholder { color: rgba(255,255,255,0.7); }
-    
+
     input:focus, select:focus {
       outline: none;
-      border-color: #667eea;
-      box-shadow: 0 0 0 3px rgba(102,126,234,0.3);
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(102,126,234,0.4);
     }
-    
+
     .hidden { display: none !important; }
-    
+
     .game-over {
       text-align: center;
-      background: linear-gradient(135deg, #ff4757, #ff3838);
-      padding: 30px;
+      background: linear-gradient(145deg, #ff4757, #ff3838);
+      padding: 28px 22px 30px;
     }
-    
-    .game-over h2 { margin-bottom: 15px; font-size: 22px; }
+
+    .game-over h2 {
+      margin-bottom: 12px;
+      font-size: 22px;
+    }
+
+    .game-over-reason {
+      font-size: 14px;
+      margin-bottom: 18px;
+      opacity: 0.9;
+    }
+
+    .actions-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .achievements-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .achievement-chip {
+      padding: 4px 9px;
+      border-radius: 999px;
+      background: var(--chip-bg);
+      font-size: 11px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid rgba(255,255,255,0.18);
+    }
+
+    .achievement-chip.locked {
+      opacity: 0.4;
+      border-style: dashed;
+    }
+
+    .top-row-buttons {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .top-row-buttons button {
+      flex: 1;
+      min-width: 0;
+    }
+
+    @media (max-width: 480px) {
+      body { padding: 10px; }
+      .header { padding: 18px; }
+      .section { padding: 16px 18px; }
+      .stats-grid { grid-template-columns: repeat(3, 1fr); }
+    }
   </style>
 </head>
 <body>
   <div id="game">
     <!-- Header -->
     <div class="header">
-      <h1>🎮 Rocco BitLife</h1>
-      <div class="subtitle">Live your life, make choices</div>
+      <div class="header-main">
+        <h1>🎮 Rocco BitLife</h1>
+        <div class="subtitle">Live your life, make bold choices</div>
+      </div>
+      <div class="header-stats">
+        <div class="header-pill">
+          ❤️ <span id="headerHealth">85</span>
+        </div>
+        <div class="header-pill">
+          😊 <span id="headerHappiness">65</span>
+        </div>
+      </div>
     </div>
 
     <!-- Character Creation -->
     <div id="characterCreation" class="section">
-      <div class="character-card">
-        <div class="country-flag" id="previewFlag">🌍</div>
-        <div class="char-name" id="previewName">Your Name</div>
-        <span class="char-age" id="previewAge">Age 0</span>
+      <div class="character-card" style="margin-bottom: 18px;">
+        <div class="char-avatar" id="previewFlag">🌍</div>
+        <div class="char-meta">
+          <div class="char-name" id="previewName">Your Name</div>
+          <div class="char-age">
+            <span>Age 0</span>
+            <span class="char-tag" id="previewCountryTag">Select a country</span>
+          </div>
+          <div class="trait-pill" id="previewTrait">Random Traits at birth</div>
+        </div>
       </div>
-      
+
       <div class="input-group">
         <label>Name</label>
         <input type="text" id="charName" placeholder="Enter your name" value="Rocco">
       </div>
-      
+
       <div class="input-group">
         <label>Gender</label>
         <select id="charGender">
@@ -221,7 +460,7 @@
           <option value="female">👩 Female</option>
         </select>
       </div>
-      
+
       <div class="input-group">
         <label>Country</label>
         <select id="charCountry">
@@ -237,7 +476,7 @@
           <option value="india">🇮🇳 India</option>
         </select>
       </div>
-      
+
       <button id="startLifeBtn" class="btn-primary">🚀 Start My Life</button>
     </div>
 
@@ -245,49 +484,117 @@
     <div id="mainGame" class="hidden">
       <div class="section">
         <div class="character-card" id="characterInfo">
-          <div class="country-flag" id="countryFlag"></div>
-          <div class="char-name" id="currentName"></div>
-          <div class="char-age">
-            Age: <span id="currentAge">0</span> | 
-            Year: <span id="currentYear">2026</span>
+          <div class="char-avatar" id="countryFlag"></div>
+          <div class="char-meta">
+            <div class="char-name" id="currentName"></div>
+            <div class="char-age">
+              <span>Age: <span id="currentAge">0</span></span> ·
+              <span>Year: <span id="currentYear">2026</span></span>
+              <span class="char-tag" id="currentCareerTag">Unemployed</span>
+            </div>
+            <div class="trait-pill" id="currentTrait">Trait: None</div>
           </div>
         </div>
-        
+
         <div class="stats-grid" id="stats"></div>
       </div>
-      
+
       <div class="section">
-        <button id="ageBtn" class="btn-primary">⏭️ Age One Year</button>
-        <button id="randomEventBtn" class="btn-secondary">🎲 Random Event</button>
-        <button id="restartBtn" class="btn-secondary">🔄 New Life</button>
+        <div class="section-title">⏱️ Time & Life</div>
+        <div class="top-row-buttons">
+          <button id="ageBtn" class="btn-primary">⏭️ Age One Year</button>
+          <button id="randomEventBtn" class="btn-secondary">🎲 Random Event</button>
+        </div>
+        <div class="actions-grid">
+          <button id="jobBtn" class="btn-secondary">💼 Jobs</button>
+          <button id="studyBtn" class="btn-secondary">📚 School</button>
+          <button id="relationshipBtn" class="btn-secondary">💖 Relationships</button>
+          <button id="crimeBtn" class="btn-danger">🕵️ Crime</button>
+        </div>
+        <div class="actions-grid">
+          <button id="gymBtn" class="btn-secondary">💪 Gym</button>
+          <button id="booksBtn" class="btn-secondary">📘 Read</button>
+          <button id="surgeryBtn" class="btn-secondary">✨ Glow Up</button>
+          <button id="restartBtn" class="btn-secondary">🔄 New Life</button>
+        </div>
       </div>
-      
+
       <div class="section">
-        <h3 style="margin-bottom: 15px; font-size: 16px;">📜 Life Achievements</h3>
+        <div class="section-title">📜 Life Log & Events</div>
         <div class="log" id="log"></div>
       </div>
+
+      <div class="section">
+        <div class="section-title">🏆 Achievements</div>
+        <div class="achievements-wrap" id="achievements">
+          <div class="achievement-chip locked" data-key="firstJob">💼 First Job</div>
+          <div class="achievement-chip locked" data-key="graduate">🎓 Graduate</div>
+          <div class="achievement-chip locked" data-key="rich">💰 100k+</div>
+          <div class="achievement-chip locked" data-key="millionaire">🤑 Millionaire</div>
+          <div class="achievement-chip locked" data-key="longLife">⌛ Age 90+</div>
+        </div>
+      </div>
     </div>
-    
+
     <!-- Game Over -->
     <div id="gameOver" class="section game-over hidden">
       <h2>💀 Game Over</h2>
-      <div style="margin-bottom: 20px; font-size: 16px;">
-        Lived to age <span id="finalAge"></span>
+      <div class="game-over-reason" id="gameOverReason"></div>
+      <div style="margin-bottom: 20px; font-size: 15px;">
+        You lived to age <span id="finalAge"></span>.
       </div>
       <button id="restartFromOver" class="btn-primary">🎮 Play Again</button>
     </div>
   </div>
 
   <script>
-    // Game state with ROUND INTEGERS ONLY
+    // GAME STATE
     const state = {
-      name: '', gender: '', country: '',
-      age: 0, year: 2026, alive: true,
-      health: 85, happiness: 65, looks: 50,
-      smartness: 50, wealth: 10, log: []
+      name: '',
+      gender: '',
+      country: '',
+      age: 0,
+      year: 2026,
+      alive: true,
+      health: 85,
+      happiness: 65,
+      looks: 50,
+      smartness: 50,
+      wealth: 10,
+      relationship: 40,
+      trait: null,
+      inSchool: true,
+      job: null,
+      jobLevel: 0,
+      jailed: false,
+      achievements: {
+        firstJob: false,
+        graduate: false,
+        rich: false,
+        millionaire: false,
+        longLife: false
+      },
+      log: []
     };
 
-    // UI Elements
+    const traits = [
+      { key: 'lucky', label: '🍀 Lucky', effect: 'betterEvents' },
+      { key: 'genius', label: '🧠 Genius', effect: 'smartBoost' },
+      { key: 'charming', label: '💋 Charming', effect: 'relationshipBoost' },
+      { key: 'tough', label: '💪 Tough', effect: 'healthBoost' },
+      { key: 'unlucky', label: '💀 Unlucky', effect: 'worseEvents' }
+    ];
+
+    const jobs = [
+      { id: 'none', label: 'Unemployed', minSmart: 0, pay: 0 },
+      { id: 'fastfood', label: 'Fast Food Worker', minSmart: 10, pay: 2000 },
+      { id: 'retail', label: 'Retail Assistant', minSmart: 15, pay: 3500 },
+      { id: 'office', label: 'Office Clerk', minSmart: 25, pay: 6000 },
+      { id: 'dev', label: 'Junior Developer', minSmart: 40, pay: 12000 },
+      { id: 'doctor', label: 'Doctor', minSmart: 70, pay: 20000 },
+      { id: 'influencer', label: 'Influencer', minSmart: 30, pay: 8000 }
+    ];
+
     const els = {
       charName: document.getElementById('charName'),
       charGender: document.getElementById('charGender'),
@@ -304,25 +611,83 @@
       countryFlag: document.getElementById('countryFlag'),
       previewFlag: document.getElementById('previewFlag'),
       previewName: document.getElementById('previewName'),
-      previewAge: document.getElementById('previewAge')
+      previewCountryTag: document.getElementById('previewCountryTag'),
+      previewTrait: document.getElementById('previewTrait'),
+      currentTrait: document.getElementById('currentTrait'),
+      headerHealth: document.getElementById('headerHealth'),
+      headerHappiness: document.getElementById('headerHappiness'),
+      achievements: document.getElementById('achievements'),
+      currentCareerTag: document.getElementById('currentCareerTag'),
+      gameOverReason: document.getElementById('gameOverReason')
     };
 
-    // ROUND ALL VALUES
     function roundStats() {
       state.health = Math.round(state.health);
       state.happiness = Math.round(state.happiness);
       state.looks = Math.round(state.looks);
       state.smartness = Math.round(state.smartness);
       state.wealth = Math.round(state.wealth);
+      state.relationship = Math.round(state.relationship);
     }
 
     function clamp(val, min, max) {
       return Math.max(min, Math.min(max, val));
     }
 
+    function getFlag(country) {
+      const flags = {
+        usa: '🇺🇸',
+        uk: '🇬🇧',
+        canada: '🇨🇦',
+        australia: '🇦🇺',
+        germany: '🇩🇪',
+        france: '🇫🇷',
+        japan: '🇯🇵',
+        brazil: '🇧🇷',
+        nigeria: '🇳🇬',
+        india: '🇮🇳'
+      };
+      return flags[country] || '🌍';
+    }
+
+    function updateAchievementsUI() {
+      const chips = els.achievements.querySelectorAll('.achievement-chip');
+      chips.forEach(chip => {
+        const key = chip.dataset.key;
+        if (state.achievements[key]) {
+          chip.classList.remove('locked');
+        }
+      });
+    }
+
+    function checkAchievements() {
+      if (!state.achievements.firstJob && state.job) {
+        state.achievements.firstJob = true;
+      }
+      if (!state.achievements.graduate && !state.inSchool && state.smartness >= 50) {
+        state.achievements.graduate = true;
+      }
+      if (!state.achievements.rich && state.wealth >= 100000) {
+        state.achievements.rich = true;
+      }
+      if (!state.achievements.millionaire && state.wealth >= 1000000) {
+        state.achievements.millionaire = true;
+      }
+      if (!state.achievements.longLife && state.age >= 90) {
+        state.achievements.longLife = true;
+      }
+      updateAchievementsUI();
+    }
+
     function updateStatsUI() {
-      roundStats(); // ENSURE CLEAN INTEGERS
-      
+      roundStats();
+
+      state.health = clamp(state.health, 0, 100);
+      state.happiness = clamp(state.happiness, 0, 100);
+      state.looks = clamp(state.looks, 0, 100);
+      state.smartness = clamp(state.smartness, 0, 100);
+      state.relationship = clamp(state.relationship, 0, 100);
+
       els.stats.innerHTML = `
         <div class="stat health">
           <span class="stat-value">${state.health}</span>
@@ -344,25 +709,31 @@
           <span class="stat-value">$${state.wealth}</span>
           <span class="stat-label">Wealth</span>
         </div>
+        <div class="stat relationship">
+          <span class="stat-value">${state.relationship}</span>
+          <span class="stat-label">Relationships</span>
+        </div>
       `;
-      
+
       els.currentAge.textContent = state.age;
       els.currentYear.textContent = state.year;
+      els.headerHealth.textContent = state.health;
+      els.headerHappiness.textContent = state.happiness;
+
+      checkAchievements();
     }
 
-    function getFlag(country) {
-      const flags = {usa:'🇺🇸',uk:'🇬🇧',canada:'🇨🇦',australia:'🇦🇺',germany:'🇩🇪',
-                     france:'🇫🇷',japan:'🇯🇵',brazil:'🇧🇷',nigeria:'🇳🇬',india:'🇮🇳'};
-      return flags[country] || '🌍';
-    }
-
-    function addLog(message) {
+    function addLog(message, tag) {
       const div = document.createElement('div');
       div.className = 'log-entry';
-      div.innerHTML = `<span class="log-name">${state.name}</span> (${state.age}) ${message}`;
+      div.innerHTML = `
+        <span class="log-name">${state.name}</span>
+        <span class="log-tag">(${state.age})${tag ? ' · ' + tag : ''}</span>
+        – ${message}
+      `;
       els.log.insertBefore(div, els.log.firstChild);
-      
-      if (els.log.children.length > 20) {
+
+      if (els.log.children.length > 40) {
         els.log.removeChild(els.log.lastChild);
       }
       els.log.scrollTop = 0;
@@ -371,69 +742,141 @@
     function previewUpdate() {
       els.previewName.textContent = els.charName.value || 'Your Name';
       els.previewFlag.textContent = getFlag(els.charCountry.value);
+      const countryLabel = els.charCountry.options[els.charCountry.selectedIndex]?.text || 'Select a country';
+      els.previewCountryTag.textContent = countryLabel;
+    }
+
+    function randomTrait() {
+      const t = traits[Math.floor(Math.random() * traits.length)];
+      state.trait = t;
+      els.previewTrait.textContent = `Trait: ${t.label}`;
+      els.currentTrait.textContent = `Trait: ${t.label}`;
+    }
+
+    function jobLabel(jobId) {
+      if (!jobId) return 'Unemployed';
+      const job = jobs.find(j => j.id === jobId);
+      return job ? job.label : 'Unemployed';
     }
 
     function startGame() {
       state.name = els.charName.value || 'Rocco';
       state.gender = els.charGender.value;
       state.country = els.charCountry.value;
-      
-      // CLEAN ROUND STARTING STATS
+
+      state.age = 0;
+      state.year = 2026;
+      state.alive = true;
+      state.inSchool = true;
+      state.job = null;
+      state.jobLevel = 0;
+      state.jailed = false;
+
       state.health = 85 + Math.floor(Math.random() * 15);
       state.happiness = 65 + Math.floor(Math.random() * 20);
       state.looks = 40 + Math.floor(Math.random() * 40);
       state.smartness = 45 + Math.floor(Math.random() * 30);
       state.wealth = 5 + Math.floor(Math.random() * 10);
-      
+      state.relationship = 40 + Math.floor(Math.random() * 20);
+
+      Object.keys(state.achievements).forEach(k => state.achievements[k] = false);
+
+      randomTrait();
       roundStats();
-      
+
       els.characterCreation.classList.add('hidden');
       els.mainGame.classList.remove('hidden');
-      
+      els.gameOver.classList.add('hidden');
+
       els.countryFlag.textContent = getFlag(state.country);
       els.currentName.textContent = state.name;
-      
+      els.currentCareerTag.textContent = 'In school';
+
+      els.log.innerHTML = '';
+      addLog('👶 You were born!', 'Birth');
+      addLog('You are currently in school.', 'Childhood');
+
       updateStatsUI();
-      addLog('👶 Born into the world!');
+      updateAchievementsUI();
+      document.getElementById('ageBtn').disabled = false;
+    }
+
+    function applyTraitOnEvent(delta) {
+      if (!state.trait) return delta;
+      if (state.trait.effect === 'betterEvents') {
+        if (delta > 0) delta += 1;
+      } else if (state.trait.effect === 'worseEvents') {
+        if (delta < 0) delta -= 1;
+      }
+      return delta;
     }
 
     function ageOneYear() {
+      if (!state.alive) return;
+
       state.age++;
       state.year++;
-      
-      // Age effects
+
+      if (state.trait && state.trait.effect === 'healthBoost') {
+        state.health += 1;
+      }
+
       if (state.age > 60) state.health -= 2;
       if (state.age > 80) state.health -= 4;
-      
-      // Random life changes
-      state.happiness += Math.floor(Math.random() * 3) - 1;
+
+      state.happiness += applyTraitOnEvent(Math.floor(Math.random() * 3) - 1);
       state.health += Math.floor(Math.random() * 2) - 1;
-      
+
+      if (state.job) {
+        const jobInfo = jobs.find(j => j.id === state.job);
+        if (jobInfo) {
+          state.wealth += jobInfo.pay;
+        }
+      }
+
       roundStats();
-      
-      // Death check
+
       if (state.health <= 0) {
-        gameOver('Health failed');
+        gameOver('Your health failed you.');
         return;
       }
       if (state.age >= 110) {
-        gameOver('Incredible long life!');
+        gameOver('You reached a legendary age.');
         return;
       }
-      
-      // Age milestone
+
       const milestones = {
-        5: 'Started school!',
-        18: 'Became an adult!',
-        30: 'Career established!',
-        65: 'Retirement age!'
+        5: 'You started primary school.',
+        13: 'You entered your teenage years.',
+        16: 'You can think about part-time work.',
+        18: 'You became an adult!',
+        21: 'You are fully independent now.',
+        30: 'Your career is taking shape.',
+        40: 'You hit your 40s. Midlife questions appear.',
+        65: 'You reached retirement age.'
       };
-      
+
       if (milestones[state.age]) {
-        addLog(milestones[state.age]);
-        state.happiness += 5;
+        addLog(milestones[state.age], 'Milestone');
+        state.happiness += 3;
       }
-      
+
+      if (state.age === 18 && state.inSchool) {
+        addLog('You graduated from school.', 'Education');
+        state.inSchool = false;
+        state.smartness += 7;
+      }
+
+      if (state.age >= 40 && Math.random() < 0.25) {
+        const choices = [
+          'You question your career path.',
+          'You feel distant from people around you.',
+          'You suddenly want a fresh start in life.'
+        ];
+        addLog(choices[Math.floor(Math.random() * choices.length)], 'Midlife');
+        state.happiness -= 3;
+      }
+
       updateStatsUI();
     }
 
@@ -442,38 +885,188 @@
       document.getElementById('finalAge').textContent = state.age;
       els.mainGame.classList.add('hidden');
       els.gameOver.classList.remove('hidden');
-      
-      addLog(`💀 Died at age ${state.age}: ${reason}`);
+      els.gameOverReason.textContent = reason;
+      addLog(`💀 You died at age ${state.age}.`, 'Game Over');
       document.getElementById('ageBtn').disabled = true;
     }
 
-    // Event listeners
-    els.startLifeBtn.onclick = startGame;
-    document.getElementById('ageBtn').onclick = ageOneYear;
-    document.getElementById('randomEventBtn').onclick = () => {
+    function chooseJob() {
+      if (state.age < 16) {
+        addLog('You are too young to work a proper job.', 'Jobs');
+        return;
+      }
+      if (state.jailed) {
+        addLog('You cannot get a job while in jail.', 'Jobs');
+        return;
+      }
+
+      const available = jobs.filter(j => j.id !== 'none' && state.smartness >= j.minSmart);
+      if (available.length === 0) {
+        addLog('No jobs will hire you yet. Study more or get older.', 'Jobs');
+        return;
+      }
+
+      const job = available[Math.floor(Math.random() * available.length)];
+      const wasJob = state.job;
+      state.job = job.id;
+      state.jobLevel++;
+
+      els.currentCareerTag.textContent = jobLabel(state.job);
+
+      if (!wasJob) {
+        addLog(`You got a job as a ${job.label}.`, 'Jobs');
+      } else {
+        addLog(`You switched career to ${job.label}.`, 'Jobs');
+      }
+
+      state.happiness += 4;
+      checkAchievements();
+      updateStatsUI();
+    }
+
+    function studyOrDropOut() {
+      if (!state.inSchool) {
+        addLog('You are no longer in school.', 'Education');
+        return;
+      }
+      if (state.age < 12) {
+        addLog('You are still too young to make big school choices.', 'Education');
+        return;
+      }
+
+      if (Math.random() < 0.5) {
+        state.smartness += 4;
+        state.happiness -= 1;
+        addLog('You studied hard this year. Your grades improved.', 'Education');
+      } else {
+        state.inSchool = false;
+        addLog('You decided to drop out of school.', 'Education');
+        state.happiness += 3;
+      }
+
+      updateStatsUI();
+    }
+
+    function relationshipAction() {
+      const roll = Math.random();
+      if (roll < 0.4) {
+        state.relationship += 6;
+        state.happiness += 3;
+        addLog('You spent quality time with a close friend.', 'Relationships');
+      } else if (roll < 0.75) {
+        state.relationship += 8;
+        state.happiness += 5;
+        addLog('You entered a new romantic relationship.', 'Relationships');
+      } else {
+        state.relationship -= 8;
+        state.happiness -= 5;
+        addLog('You had a falling out with someone important.', 'Relationships');
+      }
+      updateStatsUI();
+    }
+
+    function crimeAction() {
+      if (state.age < 14) {
+        addLog('You are too young to commit serious crime.', 'Crime');
+        return;
+      }
+      if (state.jailed) {
+        addLog('You are already in jail.', 'Crime');
+        return;
+      }
+
+      const risk = Math.random();
+      if (risk < 0.35) {
+        const loot = 2000 + Math.floor(Math.random() * 8000);
+        state.wealth += loot;
+        state.happiness += 2;
+        addLog(`You pulled off a small heist and gained $${loot}.`, 'Crime');
+      } else if (risk < 0.75) {
+        state.health -= 10;
+        state.happiness -= 8;
+        addLog('Your crime went wrong. You were hurt and feel guilty.', 'Crime');
+      } else {
+        state.jailed = true;
+        state.happiness -= 12;
+        addLog('You were caught and sent to jail.', 'Crime');
+      }
+      updateStatsUI();
+    }
+
+    function gymAction() {
+      state.health += 5;
+      state.looks += 2;
+      state.happiness += 1;
+      state.wealth -= 50;
+      addLog('You hit the gym and feel stronger.', 'Lifestyle');
+      updateStatsUI();
+    }
+
+    function booksAction() {
+      state.smartness += 4;
+      state.happiness += 1;
+      addLog('You spent time reading and learning.', 'Lifestyle');
+      updateStatsUI();
+    }
+
+    function surgeryAction() {
+      if (state.wealth < 5000) {
+        addLog('You cannot afford cosmetic surgery.', 'Lifestyle');
+        return;
+      }
+      const risk = Math.random();
+      if (risk < 0.75) {
+        state.looks += 15;
+        state.wealth -= 5000;
+        addLog('Your cosmetic surgery went well. You look amazing.', 'Lifestyle');
+      } else {
+        state.looks -= 8;
+        state.health -= 10;
+        state.wealth -= 5000;
+        addLog('The surgery had complications. You regret it.', 'Lifestyle');
+      }
+      updateStatsUI();
+    }
+
+    function randomEvent() {
       const events = [
-        {text: 'Lottery win! +$10k', wealth: 10000},
-        {text: 'Got sick -10 health', health: -10},
-        {text: 'New friend! +15 happiness', happiness: 15},
-        {text: 'Promotion! +$5k', wealth: 5000},
-        {text: 'Family vacation +10 happiness', happiness: 10}
+        { text: 'You won a small lottery prize.', wealth: 10000, happiness: 6 },
+        { text: 'You got sick and had to rest for weeks.', health: -10, happiness: -4 },
+        { text: 'You met someone who inspired you.', happiness: 10, smartness: 3 },
+        { text: 'You were promoted and got a raise.', wealth: 6000, happiness: 5 },
+        { text: 'Family vacation boosted your mood.', happiness: 12 },
+        { text: 'You had a minor accident.', health: -6 },
+        { text: 'You went viral online.', wealth: 1500, happiness: 8 },
+        { text: 'You volunteered and felt fulfilled.', happiness: 7, relationship: 5 }
       ];
-      
-      const event = events[Math.floor(Math.random() * events.length)];
-      addLog(event.text);
-      
-      if (event.wealth) state.wealth += event.wealth;
-      if (event.health) state.health = Math.max(0, state.health + event.health);
-      if (event.happiness) state.happiness = Math.min(100, state.happiness + event.happiness);
-      
+
+      const e = events[Math.floor(Math.random() * events.length)];
+      addLog(e.text, 'Event');
+
+      if (e.wealth) state.wealth += e.wealth;
+      if (e.health) state.health = Math.max(0, state.health + e.health);
+      if (e.happiness) state.happiness = clamp(state.happiness + e.happiness, 0, 100);
+      if (e.smartness) state.smartness = clamp(state.smartness + e.smartness, 0, 100);
+      if (e.relationship) state.relationship = clamp(state.relationship + e.relationship, 0, 100);
+
       roundStats();
       updateStatsUI();
-    };
-    
+    }
+
+    els.startLifeBtn.onclick = startGame;
+    document.getElementById('ageBtn').onclick = ageOneYear;
+    document.getElementById('randomEventBtn').onclick = randomEvent;
+    document.getElementById('jobBtn').onclick = chooseJob;
+    document.getElementById('studyBtn').onclick = studyOrDropOut;
+    document.getElementById('relationshipBtn').onclick = relationshipAction;
+    document.getElementById('crimeBtn').onclick = crimeAction;
+    document.getElementById('gymBtn').onclick = gymAction;
+    document.getElementById('booksBtn').onclick = booksAction;
+    document.getElementById('surgeryBtn').onclick = surgeryAction;
+
     document.getElementById('restartBtn').onclick = () => location.reload();
     document.getElementById('restartFromOver').onclick = () => location.reload();
-    
-    // Live preview
+
     els.charName.oninput = previewUpdate;
     els.charCountry.onchange = previewUpdate;
     previewUpdate();
